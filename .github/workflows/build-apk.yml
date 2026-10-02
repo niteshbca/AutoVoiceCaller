@@ -6,6 +6,10 @@ on:
 jobs:
   apk:
     runs-on: ubuntu-24.04
+    env:
+      TWILIO_SID: ${{ secrets.TWILIO_SID }}
+      TWILIO_TOKEN: ${{ secrets.TWILIO_TOKEN }}
+      TWILIO_FROM_NUMBER: ${{ secrets.TWILIO_FROM_NUMBER }}
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-java@v5
