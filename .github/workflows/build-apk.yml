@@ -25,7 +25,7 @@ jobs:
       - name: Install SDK
         run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
       - name: Build Debug APK (verbose)
-        run: gradle --no-daemon --info --stacktrace assembleDebug
+        run: gradle --no-daemon --info --stacktrace -Pkotlin.compiler.execution.strategy=in-process assembleDebug
       - name: Run Lint (non-blocking)
         run: gradle --no-daemon lintDebug || true
       - uses: actions/upload-artifact@v5
