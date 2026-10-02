@@ -68,13 +68,16 @@ object Session {
         if (running) return
         if (numbers.isEmpty() || numbers.size > maximum || numbers.any { NumberRules.normalize(it) == null }) { show("Invalid phone number or session limit exceeded"); return }
         if (text.isBlank() || text.length > android.speech.tts.TextToSpeech.getMaxSpeechInputLength()) { show("Message must contain 1–4000 characters"); return }
-        if (!speech.isReady()) { show(speech.description); return }
-        if (app.checkSelfPermission(Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED ||
-            app.checkSelfPermission(Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) { show("Call permission denied"); return }
-        if (!stateAccess) { show("Call-state access unavailable: grant permission and reopen app"); return }
-        if (calls.isNotEmpty() || phoneState != TelephonyManager.CALL_STATE_IDLE) { show("Finish existing calls before starting"); return }
+        if (!useServer && !speech.isReady()) { show(speech.description); return }
+        if (!useServer) {
+            if (app.checkSelfPermission(Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED ||
+                app.checkSelfPermission(Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) { show("Call permission denied"); return }
+            if (!stateAccess) { show("Call-state access unavailable: grant permission and reopen app"); return }
+            if (calls.isNotEmpty() || phoneState != TelephonyManager.CALL_STATE_IDLE) { show("Finish existing calls before starting"); return }
+        }
         queue = numbers.toList(); message = text; delay = delaySeconds * 1000L
-        manual = !isDialer(); index = -1; generation++; log.clear(); running = true
+        manual = !useServer && !isDialer(); index = -1; generation++; log.clear(); running = true
+        audioStatus = if (useServer) "Twilio handles audio server-side" else "Speaker routing not requested"
         next()
     }
 fun next() {
