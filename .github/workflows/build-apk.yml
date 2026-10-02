@@ -20,8 +20,8 @@ jobs:
         run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
       - name: Make gradlew executable
         run: chmod +x ./gradlew
-      - name: Build Debug APK
-        run: ./gradlew --no-daemon assembleDebug
+      - name: Build Debug APK (verbose)
+        run: ./gradlew --no-daemon --stacktrace assembleDebug
       - name: Run Lint (non-blocking)
         run: ./gradlew --no-daemon lintDebug || true
       - uses: actions/upload-artifact@v5
