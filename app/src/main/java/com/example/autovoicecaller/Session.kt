@@ -55,7 +55,7 @@ object Session {
     val log = mutableListOf<String>()
     var useServer = false
         private set
-    private lateinit var serverCaller: ServerCaller
+    internal lateinit var serverCaller: ServerCaller
 
     fun initialize(application: Application) { app = application; speech = SpeechEngine(app); serverCaller = ServerCaller(app) }
     
@@ -133,10 +133,6 @@ fun next() {
                 }
             }
         })
-    }
-            }.also { handler.postDelayed(it, 90_000) }
-        } catch (_: SecurityException) { stop("Call permission denied")
-        } catch (e: Exception) { stop("Phone call cannot be started: ${e.message ?: e.javaClass.simpleName}") }
     }
     fun onAdded(call: Call) {
         calls.add(call)

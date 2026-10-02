@@ -20,7 +20,7 @@ class ServerCaller(private val context: Context) {
     
     private val baseUrl = context.getString(R.string.server_url)
     
-    enum class Provider(val name: String, val baseUrl: String) {
+    enum class Provider(override val name: String, val baseUrl: String) {
         CUSTOM("Custom Server", ""),
         EXOTEL("Exotel", "https://api.exotel.com/v1/Accounts"),
         KNOWLARITY("Knowlarity", "https://api.knowlarity.com/v1/Accounts"),

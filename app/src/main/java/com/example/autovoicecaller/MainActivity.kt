@@ -221,6 +221,11 @@ class MainActivity : ComponentActivity() {
             .setPositiveButton("Start Calling") { _, _ -> Session.start(numbers, message.text.toString(), wait, max) }
             .setNegativeButton("Cancel", null).show()
     }
+    private fun showProviderConfigDialog(provider: ServerCaller.Provider) {
+        AlertDialog.Builder(this).setTitle("Configure $provider")
+            .setMessage("This provider requires manual configuration in code. See ServerCaller.kt")
+            .setPositiveButton("OK", null).show()
+    }
     private fun saveDraft() {
         if (!::message.isInitialized) return
         getPreferences(MODE_PRIVATE).edit().putString("numbers", numbers.joinToString("\n"))
