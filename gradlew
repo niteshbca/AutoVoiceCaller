@@ -3,11 +3,11 @@
 set -eu
 PROJECT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 DIST_DIR="$PROJECT_DIR/.gradle-dist"
-GRADLE="$DIST_DIR/gradle-8.9/bin/gradle"
+GRADLE="$DIST_DIR/gradle-8.12/bin/gradle"
 if [ ! -x "$GRADLE" ]; then
   mkdir -p "$DIST_DIR"
-  curl --fail --location https://services.gradle.org/distributions/gradle-8.9-bin.zip -o "$DIST_DIR/gradle.zip"
-  curl --fail --location https://services.gradle.org/distributions/gradle-8.9-bin.zip.sha256 -o "$DIST_DIR/gradle.sha256"
+  curl --fail --location https://services.gradle.org/distributions/gradle-8.12-bin.zip -o "$DIST_DIR/gradle.zip"
+  curl --fail --location https://services.gradle.org/distributions/gradle-8.12-bin.zip.sha256 -o "$DIST_DIR/gradle.sha256"
   python3 - "$DIST_DIR" <<'PY'
 import hashlib, pathlib, sys, zipfile
 p=pathlib.Path(sys.argv[1]); archive=p/'gradle.zip'

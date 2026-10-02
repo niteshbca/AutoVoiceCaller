@@ -15,11 +15,11 @@ jobs:
       - uses: android-actions/setup-android@v4
       - uses: gradle/actions/setup-gradle@v6
         with:
-          gradle-version: '8.9'
+          gradle-version: '8.12'
       - name: Install SDK
         run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
       - name: Compile and lint
-        run: gradle --no-daemon assembleDebug lintDebug
+        run: ./gradlew --no-daemon assembleDebug lintDebug
       - uses: actions/upload-artifact@v5
         with:
           name: AutoVoiceCaller-debug-apk
