@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">Auto Voice Caller</string>
+    <string name="default_message">Namaste, main I-METICS Group se baat kar raha hoon. Aapko hamare software ke regarding information dene ke liye call kiya gaya hai.</string>
+    <string name="physical_path">TTS → speaker → microphone → SIM call. Customer hearing is device-dependent and may fail completely. Test with a consenting colleague first.</string>
+    <string name="server_url">http://YOUR_SERVER_IP:3000</string>
+    <string name="server_mode_enabled">Server mode enabled - calls via backend</string>
+    <string name="server_mode_disabled">Local mode - calls via SIM</string>
+    <string name="exotel_sid">YOUR_EXOTEL_SID</string>
+    <string name="exotel_token">YOUR_EXOTEL_TOKEN</string>
+    <string name="exotel_number">YOUR_EXOPHONE_NUMBER</string>
+    <string name="knowlarity_sid">YOUR_KNOWLARITY_SID</string>
+    <string name="knowlarity_token">YOUR_KNOWLARITY_TOKEN</string>
+    <string name="plivo_sid">YOUR_PLIVO_AUTH_ID</string>
+    <string name="plivo_token">YOUR_PLIVO_AUTH_TOKEN</string>
+    <string name="twilio_sid">YOUR_TWILIO_SID</string>
+    <string name="twilio_token">YOUR_TWILIO_TOKEN</string>
+</resources>
