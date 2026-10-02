@@ -147,7 +147,13 @@ fun next() {
     fun onState(call: Call, state: Int) {
         if (call != ownedCall || !running) { refresh(); return }
         when (state) {
-            Call.STATE_ACTIVE -> if (!spoken) { show("Call connected"); speakNow() }
+            Call.STATE_ACTIVE -> if (!spoken) {
+                if (useServer) {
+                    show("Server call connected (audio via Twilio)")
+                } else {
+                    show("Call connected"); speakNow()
+                }
+            }
             Call.STATE_DIALING, Call.STATE_CONNECTING -> show("Calling: ${queue[index]} (waiting for answer)")
             Call.STATE_HOLDING -> stop("Queue stopped: call placed on hold")
             Call.STATE_DISCONNECTED -> {
@@ -164,7 +170,7 @@ fun next() {
         calls.remove(call)
         if (call == ownedCall) {
             ownedCall = null
-            if (running && automaticEnd) {
+            if (running && automaticEnd && !useServer) {
                 show("Calling next number...")
                 val ticket = generation
                 handler.postDelayed({ if (running && ticket == generation) next() }, 1200)
@@ -174,7 +180,7 @@ fun next() {
     }
     fun onPhoneState(state: Int) {
         val previous = phoneState; phoneState = state
-        if (running && manual) {
+        if (running && manual && !useServer) {
             when (state) {
                 TelephonyManager.CALL_STATE_RINGING -> stop("Queue stopped: incoming call")
                 TelephonyManager.CALL_STATE_OFFHOOK -> {
@@ -190,19 +196,19 @@ fun next() {
                 }
             }
         }
-        if (running && !manual && awaitingNext && visible && state == TelephonyManager.CALL_STATE_IDLE && calls.isEmpty()) {
+        if (running && !manual && !useServer && awaitingNext && visible && state == TelephonyManager.CALL_STATE_IDLE && calls.isEmpty()) {
             val ticket = generation
             handler.postDelayed({ if (ticket == generation) continueQueue() }, 300)
         }
         refresh()
     }
     fun confirmAnswered() {
-        if (running && manual && manualCallStarted && phoneState == TelephonyManager.CALL_STATE_OFFHOOK && !spoken) {
+        if (running && manual && manualCallStarted && phoneState == TelephonyManager.CALL_STATE_OFFHOOK && !spoken && !useServer) {
             show("Call connected (user confirmed)"); speakNow()
         }
     }
     private fun speakNow() {
-        if (!running || spoken) return
+        if (!running || spoken || useServer) return
         spoken = true; cancelWatchdog()
         val ticket = generation
         audioStatus = "Requesting speaker; actual TTS media routing remains device-dependent"
@@ -230,7 +236,7 @@ fun next() {
                         if (running && ticket == generation) {
                             automaticEnd = true
                             if (manual) show("Message completed: end call in system dialer, then tap Continue")
-                            else try {
+                            else if (!useServer) try {
                                 ownedCall?.disconnect()
                                 handler.postDelayed({
                                     if (running && ticket == generation && ownedCall != null) {
