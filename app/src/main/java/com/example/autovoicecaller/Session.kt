@@ -110,31 +110,34 @@ fun next() {
     private fun nextServer() {
         if (!running) return
         if (++index >= queue.size) { running = false; show("Completed"); return }
-        spoken = false; automaticEnd = false; ownedCall = null; manualCallStarted = false
-        waitingForCall = true; show("Calling via server: ${queue[index]}")
+        spoken = true; automaticEnd = true; ownedCall = null; manualCallStarted = false
+        waitingForCall = false; show("Calling via Twilio: ${queue[index]}")
         
         serverCaller.makeCall(queue[index], message, object : ServerCaller.CallCallback {
             override fun onSuccess(callId: String, channelId: String) {
                 handler.post {
                     if (!running) return@post
-                    show("Server call initiated: $callId")
+                    show("Twilio call initiated: $callId")
+                    // Twilio handles call entirely server-side; wait estimated duration then continue
                     val ticket = generation
-                    watchdog = Runnable {
-                        if (running && ticket == generation && !spoken) {
-                            stop("Server call timeout")
+                    handler.postDelayed({
+                        if (running && ticket == generation) {
+                            show("Twilio call estimated complete; continuing...")
+                            next()
                         }
-                    }.also { handler.postDelayed(it, 120_000) }
+                    }, 30_000) // 30 sec estimated call duration
                 }
             }
             override fun onError(error: String) {
                 handler.post {
                     if (!running) return@post
-                    stop("Server call failed: $error")
+                    stop("Twilio call failed: $error")
                 }
             }
         })
     }
     fun onAdded(call: Call) {
+        if (useServer) return
         calls.add(call)
         val outgoing = if (android.os.Build.VERSION.SDK_INT >= 29) call.details.callDirection == Call.Details.DIRECTION_OUTGOING else call.state != Call.STATE_RINGING
         val number = call.details.handle?.schemeSpecificPart
@@ -145,14 +148,10 @@ fun next() {
         refresh()
     }
     fun onState(call: Call, state: Int) {
-        if (call != ownedCall || !running) { refresh(); return }
+        if (call != ownedCall || !running || useServer) { refresh(); return }
         when (state) {
             Call.STATE_ACTIVE -> if (!spoken) {
-                if (useServer) {
-                    show("Server call connected (audio via Twilio)")
-                } else {
-                    show("Call connected"); speakNow()
-                }
+                show("Call connected"); speakNow()
             }
             Call.STATE_DIALING, Call.STATE_CONNECTING -> show("Calling: ${queue[index]} (waiting for answer)")
             Call.STATE_HOLDING -> stop("Queue stopped: call placed on hold")
